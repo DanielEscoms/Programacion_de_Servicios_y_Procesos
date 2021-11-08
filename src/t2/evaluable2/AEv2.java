@@ -14,8 +14,8 @@ public class AEv2 {
 
 	public String[] leerNEO(String linea) {
 		String[] propiedadesNEO = linea.split(",");
-		System.out.println("El NEO " + propiedadesNEO[0] + ", tiene la posicion " + propiedadesNEO[1]
-				+ " y tiene una velocidad de " + propiedadesNEO[2] + " km/s.");
+//		System.out.println("El NEO " + propiedadesNEO[0] + ", tiene la posicion " + propiedadesNEO[1]
+//				+ " y tiene una velocidad de " + propiedadesNEO[2] + " km/s.");
 		return propiedadesNEO;
 	}
 
@@ -27,7 +27,7 @@ public class AEv2 {
 			String javaHome = System.getProperty("java.home");
 			String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
 			String classpath = System.getProperty("java.class.path");
-			System.out.println(classpath);
+//			System.out.println(classpath);
 			String className = clase;
 
 			List<String> command = new ArrayList<>();
@@ -39,14 +39,14 @@ public class AEv2 {
 			command.add(propiedadesNEO[1].toString());
 			command.add(propiedadesNEO[2].toString());
 
-			System.out.println(command);
+//			System.out.println(command);
 
 			ProcessBuilder builder = new ProcessBuilder(command);
 			builder.directory(directorioProbabilidad);
 			builder.redirectOutput(fichProbabilidad);
 			Process process = builder.start();
-			process.waitFor();
-			System.out.println(process.exitValue());
+//			process.waitFor();
+//			System.out.println(process.exitValue());
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -54,7 +54,7 @@ public class AEv2 {
 		}
 	}
 
-	public static void getResultadoFichero(String nombreFichero) {
+	public void getResultadoFichero(String nombreFichero) {
 
 		try {
 			FileInputStream fichero = new FileInputStream(nombreFichero);
@@ -62,7 +62,9 @@ public class AEv2 {
 			BufferedReader br = new BufferedReader(isr);
 			String linea = br.readLine();
 			double probabilidad = Double.parseDouble(linea);
-			System.out.println("La probabilidad de que el NEO colisione es del " + probabilidad + "%");
+			probabilidad = (double) Math.round(probabilidad * 100d) / 100d;
+			System.out.println(
+					"La probabilidad de que el NEO " + nombreFichero + " colisione es del " + probabilidad + "%");
 			if (probabilidad > 10) {
 				System.err.println("Alerta Mundial!! Riesgo elevado de impacto terrestre");
 			} else {
@@ -75,23 +77,72 @@ public class AEv2 {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
-
-	public static void main(String[] args) {
-		int numeroCores = Runtime.getRuntime().availableProcessors();
-		System.out.println(numeroCores);
+	
+	public void comprobarFin(int numeroCores, int bloqueNum){
+		boolean comprobarFin = false;
 		AEv2 objeto = new AEv2();
 		try {
 			File f = new File("NEOs.txt");
 			FileReader fr = new FileReader(f);
 			BufferedReader br = new BufferedReader(fr);
 			String linea = br.readLine();
-			
+			if(bloqueNum>1) { //para situarme en la linea correspondiente de lectura
+				for (int i = 0; i< (bloqueNum-1)*4;i++) {
+					br.readLine();
+				}
+			}
+
 			for (int i = 0; i < numeroCores; i++) {
 				String[] propiedadesNEO = objeto.leerNEO(linea);
-				objeto.lanzarProbabilidad(propiedadesNEO);
+				while (!comprobarFin) {
+					try {
+						objeto.getResultadoFichero(propiedadesNEO[0]);
+						Thread.sleep(100);
+						comprobarFin = true;
+					} catch (Exception e) {
+
+					}
+				}
+				comprobarFin = false;
 				linea = br.readLine();
+
+			}
+			br.close();
+			fr.close();
+			comprobarFin = true;
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void main(String[] args) {
+		long tiempoInicio = System.nanoTime();
+		int numeroCores = Runtime.getRuntime().availableProcessors();
+//		System.out.println(numeroCores);
+		AEv2 objeto = new AEv2();
+		int numNEO = 0;
+		try {
+			File f = new File("NEOs.txt");
+			FileReader fr = new FileReader(f);
+			BufferedReader br = new BufferedReader(fr);
+			String linea = br.readLine();
+			int bloqueNum = 1;
+			
+			while (linea != null) {
+				System.out.println("Bloque procesado número: "+bloqueNum);
+				for (int i = 0; i < numeroCores; i++) {
+					String[] propiedadesNEO = objeto.leerNEO(linea);
+					objeto.lanzarProbabilidad(propiedadesNEO);
+					linea = br.readLine();
+					numNEO++;
+				}
+				objeto.comprobarFin(numeroCores, bloqueNum);
+				bloqueNum++;
 			}
 			br.close();
 			fr.close();
@@ -102,8 +153,12 @@ public class AEv2 {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		long tiempoFin = System.nanoTime();
+		long duracion = (tiempoFin-tiempoInicio)/1000000; //milisegundos
+		System.out.println("Tiempo de ejecucion total: "+duracion+" ms");
+		long duracionMediaNeo = duracion/numNEO;
+		System.out.println("Tiempo de ejecucion medio por NEO: "+duracionMediaNeo+" ms");
 		
-
 	}
 
 }
