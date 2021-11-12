@@ -4,7 +4,6 @@ public class Minero implements Runnable {
 	int bolsa;
 	long tiempoExtraccion;
 	Mina mina;
-	int recolectaEsperada;
 
 	Minero(Mina mina) {
 		this.bolsa = 0;
@@ -12,14 +11,14 @@ public class Minero implements Runnable {
 		this.mina = mina;
 	}
 
-	synchronized public void extraerRecurso(String nombre) {
-		if (mina.stock > 0) {
-//			System.out.println("Stock de" + mina.stock);
+	synchronized public void extraerRecurso(String nombre, int cantidadARecolectar) {
+		if (cantidadARecolectar <= mina.stock) {
+			System.out.println("Stock de " + mina.stock);
 			mina.stock--;
+			mina.recolectado++;
 			bolsa = 1;
 			System.out.println(
 					"El " + nombre + " ha recolectado " + bolsa + " de oro, Stock de mina restante: " + mina.stock);
-			
 		} else {
 			System.err.println("No hay stock suficiente");
 		}
@@ -30,23 +29,14 @@ public class Minero implements Runnable {
 
 		while (mina.stock > 0) {
 			String nombre = Thread.currentThread().getName();
-			extraerRecurso(nombre);
+			int cantidadARecolectar = 1;
+			extraerRecurso(nombre,cantidadARecolectar);
 			try {
 				Thread.sleep(tiempoExtraccion);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-			mina.recolectado++;
-			
 		}
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Se ha recolectado un total de " + mina.recolectado + "oro.");
 	}
 }
