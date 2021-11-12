@@ -11,7 +11,8 @@ public class App {
 			while (true) {
 				synchronized (this) {
 					try {
-						while (encendido == false) wait();
+						while (encendido == false)
+							wait();
 						System.err.println("Ventilador encendido");
 						Thread.sleep(tiempo);
 						System.out.println("Ventilador ha estado encendido durante " + tiempo / 1000 + " segundos.");
@@ -23,12 +24,13 @@ public class App {
 				}
 			}
 		}
-		
+
 		public void apagarVentilador() {
 			while (true) {
 				synchronized (this) {
 					try {
-						while (encendido == true) wait();
+						while (encendido == true)
+							wait();
 						System.err.println("Ventilador apagado");
 						Thread.sleep(tiempo);
 						System.out.println("Ventilador ha estado apagado durante " + tiempo / 1000 + " segundos.");
@@ -45,14 +47,14 @@ public class App {
 
 	public static void main(String[] args) {
 		Ventilador v = new Ventilador();
-		
-		Thread t1=new Thread(new Runnable() {
+
+		Thread t1 = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				v.encenderVentilador();
 			}
 		});
-		Thread t2=new Thread(new Runnable() {
+		Thread t2 = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				v.apagarVentilador();
@@ -60,7 +62,7 @@ public class App {
 		});
 		t1.start();
 		t2.start();
-		
+
 		Mina mina = new Mina(150);
 		Minero minero = new Minero(mina);
 		Thread t;
@@ -72,7 +74,6 @@ public class App {
 		try {
 			Thread.sleep(8000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Se ha recolectado un total de " + mina.recolectado + "oro.");

@@ -22,7 +22,7 @@ public class Minero implements Runnable {
 		} else {
 			System.err.println("No hay stock suficiente");
 		}
-		
+
 	}
 
 	public void run() {
@@ -30,11 +30,10 @@ public class Minero implements Runnable {
 		while (mina.stock > 0) {
 			String nombre = Thread.currentThread().getName();
 			int cantidadARecolectar = 1;
-			extraerRecurso(nombre,cantidadARecolectar);
+			extraerRecurso(nombre, cantidadARecolectar);
 			try {
 				Thread.sleep(tiempoExtraccion);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
