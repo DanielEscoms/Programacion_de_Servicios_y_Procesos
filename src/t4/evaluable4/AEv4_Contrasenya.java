@@ -6,11 +6,12 @@ public class AEv4_Contrasenya implements Serializable{ // He creado la siguiente
 								// los atributos, luego clic derecho, Source y los distintos campos,
 								// Constructor bacío, constructor con atributos, getters y setters y toString().
 	
+	// Add generated serial version ID,  se añade este texto auto para que no de error en Serializar.
+	private static final long serialVersionUID = 1L; 
 	String contrasenyaPlana, contrasenyaEncriptada;
 
 	public AEv4_Contrasenya() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public AEv4_Contrasenya(String contrasenyaPlana, String contrasenyaEncriptada) {
