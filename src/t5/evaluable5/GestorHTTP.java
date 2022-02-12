@@ -8,95 +8,186 @@ import java.io.OutputStream;
 
 import com.sun.net.httpserver.*;
 
-public class GestorHTTP implements HttpHandler {
-	
-	public String temperaturaActual = "15";
-	public String temperaturaTermostato = "15";
-	
-	@Override    
+public class GestorHTTP implements HttpHandler { // tinc temp actual y termostato com daos, al Get les trau per
+													// pantalla, si fique post la varia de grau en grau fins aplegar
+													// la actual a la del termostato.
+
+	public int temperaturaActual = 15;
+	public int temperaturaTermostato = 15;
+	public boolean repite = true;
+
+	@Override
 	public void handle(HttpExchange httpExchange) throws IOException {
-		
+
 		System.out.print("Peticion recibida: Tipo ");
-		String requestParamValue=null; 
-		if("GET".equalsIgnoreCase(httpExchange.getRequestMethod())) { 
+		String requestParamValue = null;
+		if ("GET".equalsIgnoreCase(httpExchange.getRequestMethod())) {
 			System.out.println("GET");
 			requestParamValue = handleGetRequest(httpExchange);
-			handleGetResponse(httpExchange,requestParamValue); 
-		} else if ("POST".equalsIgnoreCase(httpExchange.getRequestMethod())) { 
+			handleGetResponse(httpExchange, requestParamValue);
+		} else if ("POST".equalsIgnoreCase(httpExchange.getRequestMethod())) {
 			System.out.println("POST");
 			requestParamValue = handlePostRequest(httpExchange);
-			handlePostResponse(httpExchange,requestParamValue);
+			try {
+				handlePostResponse(httpExchange, requestParamValue);
+			} catch (IOException | InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else {
 			System.out.println("DESCONOCIDA");
 		}
-		
+
 	}
-	
-	
-	//INICIO BLOQUE REQUEST
-	
-	
+
 	private String handleGetRequest(HttpExchange httpExchange) {
 		System.out.println("Recibida URI tipo GET: " + httpExchange.getRequestURI().toString());
-		return httpExchange.getRequestURI().toString().split("\\?")[1].split("=")[1];
+		return httpExchange.getRequestURI().toString().split("\\?")[1];
 	}
-	
+
 	private String handlePostRequest(HttpExchange httpExchange) {
 		System.out.println("Recibida URI tipo POST: " + httpExchange.getRequestBody().toString());
-        InputStream is = httpExchange.getRequestBody();
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(isr);
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try {
+		InputStream is = httpExchange.getRequestBody();
+		InputStreamReader isr = new InputStreamReader(is);
+		BufferedReader br = new BufferedReader(isr);
+		StringBuilder sb = new StringBuilder();
+		String line;
+		try {
 			while ((line = br.readLine()) != null) {
-			    sb.append(line);
+				sb.append(line);
 			}
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        return sb.toString();
+		return sb.toString();
 	}
-	
-	//FIN BLOQUE REQUEST
-	
-	
-	//INICIO BLOQUE RESPONSE
-	
-	private void handleGetResponse(HttpExchange httpExchange, String requestParamValue)  throws  IOException {
-		
+
+	private void handleGetResponse(HttpExchange httpExchange, String requestParamValue) throws IOException {
+
 		System.out.println("El servidor pasa a procesar la peticion GET: " + requestParamValue);
-		
-		//Ejemplo de respuesta: el servidor devuelve al cliente un HTML simple:
-		OutputStream outputStream = httpExchange.getResponseBody();
-        String htmlResponse = "<html><body><h1>Hola " + requestParamValue + "</h1></body></html>";
-		httpExchange.sendResponseHeaders(200, htmlResponse.length());
-        outputStream.write(htmlResponse.getBytes());
-        outputStream.flush();
-        outputStream.close();
-        System.out.println("Devuelve respuesta HTML: " + htmlResponse);
+
+		if (requestParamValue.equals("temperaturaActual")) {
+			// respuesta: el servidor devuelve al cliente un HTML simple:
+			OutputStream outputStream = httpExchange.getResponseBody();
+			String htmlResponse = "<html><body><h1>Temperatura actual: " + temperaturaActual + " grados Celsius</h1>"
+					+ "<h1> Temperatura estufa: " + temperaturaTermostato + " grados Celsius</h1></body></html>";
+			httpExchange.sendResponseHeaders(200, htmlResponse.length());
+			outputStream.write(htmlResponse.getBytes());
+			outputStream.flush();
+			outputStream.close();
+			System.out.println("Devuelve respuesta HTML: " + htmlResponse);
+		}
 	}
-	
-	private void handlePostResponse(HttpExchange httpExchange, String requestParamValue)  throws  IOException {
+
+	private void handlePostResponse(HttpExchange httpExchange, String requestParamValue)  throws  IOException, InterruptedException {
 		
 		System.out.println("El servidor pasa a procesar el body de la peticion POST: " + requestParamValue);
 		
-		//Opcion 1: si queremos que el servidor devuelva al cliente un HTML:
-		//OutputStream outputStream = httpExchange.getResponseBody();
-		//String htmlResponse = "Parametro/s POST: " + requestParamValue + " -> Se procesara por parte del servidor";
-        //outputStream.write(htmlResponse.getBytes());
-        //outputStream.flush();
-        //outputStream.close();
-        //System.out.println("Devuelve respuesta HTML: " + htmlResponse);
-		//httpExchange.sendResponseHeaders(200, htmlResponse.length());
-		//System.out.println("Devuelve respuesta HTML: " + htmlResponse);
+		if (requestParamValue.toString().split("=")[0].equals("setTemperatura")) {
+			
+				if (temperaturaTermostato != Integer.parseInt(requestParamValue.split("=")[1])) {
+					temperaturaTermostato = Integer.parseInt(requestParamValue.split("=")[1]);
+					
+					//respuesta: el servidor devuelve al cliente un HTML:
+					OutputStream outputStream = httpExchange.getResponseBody();
+					String htmlResponse = "<html><body><h1>Temperatura actual: " + temperaturaActual + " grados Celsius</h1>"
+						+ "<h1> Temperatura estufa: " + temperaturaTermostato + " grados Celsius</h1></body></html>";
+					httpExchange.sendResponseHeaders(200, htmlResponse.length());
+					outputStream.write(htmlResponse.getBytes());
+					outputStream.flush();
+					outputStream.close();
+					System.out.println("Devuelve respuesta HTML: " + htmlResponse);
+					regularTemperatura();
+					
+				} else {
+					OutputStream outputStream = httpExchange.getResponseBody();
+					String htmlResponse = "<html><body><h1>Temperatura actual: " + temperaturaActual + " grados Celsius</h1>"
+						+ "<h1> Temperatura estufa: " + temperaturaTermostato + " grados Celsius</h1></body></html>";
+					httpExchange.sendResponseHeaders(200, htmlResponse.length());
+					outputStream.write(htmlResponse.getBytes());
+					outputStream.flush();
+					outputStream.close();
+					System.out.println("Devuelve respuesta HTML: " + htmlResponse);
+					repite=false;
+				}
+			
+		} else {
+			OutputStream outputStream = httpExchange.getResponseBody();
+			String htmlResponse = "<html><body><h1>Instruccion incorrecta, se necesita:</h1><h1>setTemperatura=X "
+					+ "(X es el valor de a temp, p.ej. 17)</h1></body></html>";
+			httpExchange.sendResponseHeaders(200, htmlResponse.length());
+	        outputStream.write(htmlResponse.getBytes());
+	        outputStream.flush();
+	        outputStream.close();
+			System.out.println("Devuelve respuesta HTML: " + htmlResponse);
+		}
 		
-		//Opcion 2: el servidor devuelve al cliente un codigo de ok pero sin contenido HTML
-		httpExchange.sendResponseHeaders(204, -1);
-		System.out.println("El servidor devuelve codigo 204");
 		
 	}
 	
-	//FIN BLOQUE RESPONSE
+	/*private void handlePostResponse(HttpExchange httpExchange, String requestParamValue)  throws  IOException, InterruptedException {
+		
+		System.out.println("El servidor pasa a procesar el body de la peticion POST: " + requestParamValue);
+		
+		if (requestParamValue.toString().split("=")[0].equals("setTemperatura")) {
+			while(repite) {
+				if (temperaturaTermostato != Integer.parseInt(requestParamValue.split("=")[1])) {
+					temperaturaTermostato = Integer.parseInt(requestParamValue.split("=")[1]);
+					regularTemperatura();
+					//respuesta: el servidor devuelve al cliente un HTML:
+					OutputStream outputStream = httpExchange.getResponseBody();
+					String htmlResponse = "<html><body><h1>Temperatura actual: " + temperaturaActual + " grados Celsius</h1>"
+						+ "<h1> Temperatura estufa: " + temperaturaTermostato + " grados Celsius</h1></body></html>";
+					httpExchange.sendResponseHeaders(200, htmlResponse.length());
+					outputStream.write(htmlResponse.getBytes());
+					outputStream.flush();
+					outputStream.close();
+					System.out.println("Devuelve respuesta HTML: " + htmlResponse);
+					Thread.sleep(1000);
+				} else {
+					OutputStream outputStream = httpExchange.getResponseBody();
+					String htmlResponse = "<html><body><h1>Temperatura actual: " + temperaturaActual + " grados Celsius</h1>"
+						+ "<h1> Temperatura estufa: " + temperaturaTermostato + " grados Celsius</h1></body></html>";
+					httpExchange.sendResponseHeaders(200, htmlResponse.length());
+					outputStream.write(htmlResponse.getBytes());
+					outputStream.flush();
+					outputStream.close();
+					System.out.println("Devuelve respuesta HTML: " + htmlResponse);
+					repite=false;
+				}
+			}
+		} else {
+			OutputStream outputStream = httpExchange.getResponseBody();
+			String htmlResponse = "<html><body><h1>Instruccion incorrecta, se necesita:</h1><h1>setTemperatura=X "
+					+ "(X es el valor de a temp, p.ej. 17)</h1></body></html>";
+			httpExchange.sendResponseHeaders(200, htmlResponse.length());
+	        outputStream.write(htmlResponse.getBytes());
+	        outputStream.flush();
+	        outputStream.close();
+			System.out.println("Devuelve respuesta HTML: " + htmlResponse);
+		}
+		
+		
+	}*/
+
+	private void regularTemperatura() {
+		while(repite) {
+			if (temperaturaActual < temperaturaTermostato) {
+			temperaturaActual++;
+			} else {
+				temperaturaActual--;
+			}
+			System.out.println("\nTemperatura actual: " + temperaturaActual + "\n Temperatura estufa: " + temperaturaTermostato);
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	 
+
+	// FIN BLOQUE RESPONSE
 }
