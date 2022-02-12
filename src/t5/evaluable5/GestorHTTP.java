@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+
+import javax.mail.MessagingException;
 
 import com.sun.net.httpserver.*;
 
@@ -84,8 +87,24 @@ public class GestorHTTP implements HttpHandler { // tinc temp actual y termostat
 			throws IOException, InterruptedException {
 
 		System.out.println("El servidor pasa a procesar el body de la peticion POST: " + requestParamValue);
-
-		if (requestParamValue.toString().split("=")[0].equals("setTemperatura")) {
+		//danielescomspruebas@gmail.com
+		// notificarAveria:email_remitente=danielescomspruebas@gmail.com;pass_remitente=prueba1234
+		if (requestParamValue.toString().split(":")[0].equals("notificarAveria")) {
+			String email_remitente = requestParamValue.split("=")[1].split(";")[0];
+			String pass_remitente = requestParamValue.split("=")[1].split("=")[1];
+			
+			Servidor servidor = new Servidor();
+			try {
+				servidor.envioMail(email_remitente, pass_remitente);
+				System.out.println("\nENVIO REALIZADO CON EXITO");
+			} catch (UnsupportedEncodingException | MessagingException e) {
+				System.err.println("ERROR EN EL ENVIO");
+				e.printStackTrace();
+			}
+			
+		}
+		
+		else if (requestParamValue.toString().split("=")[0].equals("setTemperatura")) {
 
 			if (temperaturaTermostato != Integer.parseInt(requestParamValue.split("=")[1])) {
 				temperaturaTermostato = Integer.parseInt(requestParamValue.split("=")[1]);
@@ -117,7 +136,8 @@ public class GestorHTTP implements HttpHandler { // tinc temp actual y termostat
 		} else {
 			OutputStream outputStream = httpExchange.getResponseBody();
 			String htmlResponse = "<html><body><h1>Instruccion incorrecta, se necesita:</h1><h1>setTemperatura=X "
-					+ "(X es el valor de a temp, p.ej. 17)</h1></body></html>";
+					+ "(X es el valor de a temp, p.ej. 17)</h1><h1>o bien se necesita: notificarAveria:"
+					+ "email_remitente=EMAIL;pass_remitente=PASSWORD</h1></body></html>";
 			httpExchange.sendResponseHeaders(200, htmlResponse.length());
 			outputStream.write(htmlResponse.getBytes());
 			outputStream.flush();
