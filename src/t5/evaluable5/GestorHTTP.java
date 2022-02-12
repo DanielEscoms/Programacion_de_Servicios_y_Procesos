@@ -80,114 +80,114 @@ public class GestorHTTP implements HttpHandler { // tinc temp actual y termostat
 		}
 	}
 
-	private void handlePostResponse(HttpExchange httpExchange, String requestParamValue)  throws  IOException, InterruptedException {
-		
+	private void handlePostResponse(HttpExchange httpExchange, String requestParamValue)
+			throws IOException, InterruptedException {
+
 		System.out.println("El servidor pasa a procesar el body de la peticion POST: " + requestParamValue);
-		
+
 		if (requestParamValue.toString().split("=")[0].equals("setTemperatura")) {
-			
-				if (temperaturaTermostato != Integer.parseInt(requestParamValue.split("=")[1])) {
-					temperaturaTermostato = Integer.parseInt(requestParamValue.split("=")[1]);
-					
-					//respuesta: el servidor devuelve al cliente un HTML:
-					OutputStream outputStream = httpExchange.getResponseBody();
-					String htmlResponse = "<html><body><h1>Temperatura actual: " + temperaturaActual + " grados Celsius</h1>"
-						+ "<h1> Temperatura estufa: " + temperaturaTermostato + " grados Celsius</h1></body></html>";
-					httpExchange.sendResponseHeaders(200, htmlResponse.length());
-					outputStream.write(htmlResponse.getBytes());
-					outputStream.flush();
-					outputStream.close();
-					System.out.println("Devuelve respuesta HTML: " + htmlResponse);
-					regularTemperatura();
-					
-				} else {
-					OutputStream outputStream = httpExchange.getResponseBody();
-					String htmlResponse = "<html><body><h1>Temperatura actual: " + temperaturaActual + " grados Celsius</h1>"
-						+ "<h1> Temperatura estufa: " + temperaturaTermostato + " grados Celsius</h1></body></html>";
-					httpExchange.sendResponseHeaders(200, htmlResponse.length());
-					outputStream.write(htmlResponse.getBytes());
-					outputStream.flush();
-					outputStream.close();
-					System.out.println("Devuelve respuesta HTML: " + htmlResponse);
-					repite=false;
-				}
-			
-		} else {
-			OutputStream outputStream = httpExchange.getResponseBody();
-			String htmlResponse = "<html><body><h1>Instruccion incorrecta, se necesita:</h1><h1>setTemperatura=X "
-					+ "(X es el valor de a temp, p.ej. 17)</h1></body></html>";
-			httpExchange.sendResponseHeaders(200, htmlResponse.length());
-	        outputStream.write(htmlResponse.getBytes());
-	        outputStream.flush();
-	        outputStream.close();
-			System.out.println("Devuelve respuesta HTML: " + htmlResponse);
-		}
-		
-		
-	}
-	
-	/*private void handlePostResponse(HttpExchange httpExchange, String requestParamValue)  throws  IOException, InterruptedException {
-		
-		System.out.println("El servidor pasa a procesar el body de la peticion POST: " + requestParamValue);
-		
-		if (requestParamValue.toString().split("=")[0].equals("setTemperatura")) {
-			while(repite) {
-				if (temperaturaTermostato != Integer.parseInt(requestParamValue.split("=")[1])) {
-					temperaturaTermostato = Integer.parseInt(requestParamValue.split("=")[1]);
-					regularTemperatura();
-					//respuesta: el servidor devuelve al cliente un HTML:
-					OutputStream outputStream = httpExchange.getResponseBody();
-					String htmlResponse = "<html><body><h1>Temperatura actual: " + temperaturaActual + " grados Celsius</h1>"
-						+ "<h1> Temperatura estufa: " + temperaturaTermostato + " grados Celsius</h1></body></html>";
-					httpExchange.sendResponseHeaders(200, htmlResponse.length());
-					outputStream.write(htmlResponse.getBytes());
-					outputStream.flush();
-					outputStream.close();
-					System.out.println("Devuelve respuesta HTML: " + htmlResponse);
-					Thread.sleep(1000);
-				} else {
-					OutputStream outputStream = httpExchange.getResponseBody();
-					String htmlResponse = "<html><body><h1>Temperatura actual: " + temperaturaActual + " grados Celsius</h1>"
-						+ "<h1> Temperatura estufa: " + temperaturaTermostato + " grados Celsius</h1></body></html>";
-					httpExchange.sendResponseHeaders(200, htmlResponse.length());
-					outputStream.write(htmlResponse.getBytes());
-					outputStream.flush();
-					outputStream.close();
-					System.out.println("Devuelve respuesta HTML: " + htmlResponse);
-					repite=false;
-				}
+
+			if (temperaturaTermostato != Integer.parseInt(requestParamValue.split("=")[1])) {
+				temperaturaTermostato = Integer.parseInt(requestParamValue.split("=")[1]);
+
+				// respuesta: el servidor devuelve al cliente un HTML:
+				OutputStream outputStream = httpExchange.getResponseBody();
+				String htmlResponse = "<html><body><h1>Temperatura actual: " + temperaturaActual
+						+ " grados Celsius</h1>" + "<h1> Temperatura estufa: " + temperaturaTermostato
+						+ " grados Celsius</h1></body></html>";
+				httpExchange.sendResponseHeaders(200, htmlResponse.length());
+				outputStream.write(htmlResponse.getBytes());
+				outputStream.flush();
+				outputStream.close();
+				System.out.println("Devuelve respuesta HTML: " + htmlResponse);
+				regularTemperatura();
+
+			} else {
+				OutputStream outputStream = httpExchange.getResponseBody();
+				String htmlResponse = "<html><body><h1>Temperatura actual: " + temperaturaActual
+						+ " grados Celsius</h1>" + "<h1> Temperatura estufa: " + temperaturaTermostato
+						+ " grados Celsius</h1></body></html>";
+				httpExchange.sendResponseHeaders(200, htmlResponse.length());
+				outputStream.write(htmlResponse.getBytes());
+				outputStream.flush();
+				outputStream.close();
+				System.out.println("Devuelve respuesta HTML: " + htmlResponse);
 			}
+
 		} else {
 			OutputStream outputStream = httpExchange.getResponseBody();
 			String htmlResponse = "<html><body><h1>Instruccion incorrecta, se necesita:</h1><h1>setTemperatura=X "
 					+ "(X es el valor de a temp, p.ej. 17)</h1></body></html>";
 			httpExchange.sendResponseHeaders(200, htmlResponse.length());
-	        outputStream.write(htmlResponse.getBytes());
-	        outputStream.flush();
-	        outputStream.close();
+			outputStream.write(htmlResponse.getBytes());
+			outputStream.flush();
+			outputStream.close();
 			System.out.println("Devuelve respuesta HTML: " + htmlResponse);
 		}
-		
-		
-	}*/
+
+	}
+
+	/*
+	 * private void handlePostResponse(HttpExchange httpExchange, String
+	 * requestParamValue) throws IOException, InterruptedException {
+	 * 
+	 * System.out.
+	 * println("El servidor pasa a procesar el body de la peticion POST: " +
+	 * requestParamValue);
+	 * 
+	 * if (requestParamValue.toString().split("=")[0].equals("setTemperatura")) {
+	 * while(repite) { if (temperaturaTermostato !=
+	 * Integer.parseInt(requestParamValue.split("=")[1])) { temperaturaTermostato =
+	 * Integer.parseInt(requestParamValue.split("=")[1]); regularTemperatura();
+	 * //respuesta: el servidor devuelve al cliente un HTML: OutputStream
+	 * outputStream = httpExchange.getResponseBody(); String htmlResponse =
+	 * "<html><body><h1>Temperatura actual: " + temperaturaActual +
+	 * " grados Celsius</h1>" + "<h1> Temperatura estufa: " + temperaturaTermostato
+	 * + " grados Celsius</h1></body></html>"; httpExchange.sendResponseHeaders(200,
+	 * htmlResponse.length()); outputStream.write(htmlResponse.getBytes());
+	 * outputStream.flush(); outputStream.close();
+	 * System.out.println("Devuelve respuesta HTML: " + htmlResponse);
+	 * Thread.sleep(1000); } else { OutputStream outputStream =
+	 * httpExchange.getResponseBody(); String htmlResponse =
+	 * "<html><body><h1>Temperatura actual: " + temperaturaActual +
+	 * " grados Celsius</h1>" + "<h1> Temperatura estufa: " + temperaturaTermostato
+	 * + " grados Celsius</h1></body></html>"; httpExchange.sendResponseHeaders(200,
+	 * htmlResponse.length()); outputStream.write(htmlResponse.getBytes());
+	 * outputStream.flush(); outputStream.close();
+	 * System.out.println("Devuelve respuesta HTML: " + htmlResponse); repite=false;
+	 * } } } else { OutputStream outputStream = httpExchange.getResponseBody();
+	 * String htmlResponse =
+	 * "<html><body><h1>Instruccion incorrecta, se necesita:</h1><h1>setTemperatura=X "
+	 * + "(X es el valor de a temp, p.ej. 17)</h1></body></html>";
+	 * httpExchange.sendResponseHeaders(200, htmlResponse.length());
+	 * outputStream.write(htmlResponse.getBytes()); outputStream.flush();
+	 * outputStream.close(); System.out.println("Devuelve respuesta HTML: " +
+	 * htmlResponse); }
+	 * 
+	 * 
+	 * }
+	 */
 
 	private void regularTemperatura() {
-		while(repite) {
-			if (temperaturaActual < temperaturaTermostato) {
-			temperaturaActual++;
-			} else {
-				temperaturaActual--;
-			}
-			System.out.println("\nTemperatura actual: " + temperaturaActual + "\n Temperatura estufa: " + temperaturaTermostato);
+		while (repite) {
 			try {
 				Thread.sleep(500);
+				if (temperaturaActual < temperaturaTermostato) {
+					temperaturaActual++;
+				} else if (temperaturaActual > temperaturaTermostato) {
+					temperaturaActual--;
+				} else {
+					repite = false;
+				}
+				System.out.println("\nTemperatura actual: " + temperaturaActual + "\n Temperatura estufa: "
+						+ temperaturaTermostato);
+
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				System.out.println("Error en el bucle");
 				e.printStackTrace();
 			}
 		}
 	}
-	 
 
 	// FIN BLOQUE RESPONSE
 }
