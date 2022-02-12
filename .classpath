@@ -3,8 +3,29 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-16">
 		<attributes>
 			<attribute name="module" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+		<accessrules>
+			<accessrule kind="accessible" pattern="com.sun.net.httpserver.HttpServer"/>
+			<accessrule kind="accessible" pattern="com.sun.net.httpserver.HttpExchange"/>
+			<accessrule kind="accessible" pattern="com.sun.net.httpserver.HttpHandler"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="src" output="target/classes" path="src">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+		<accessrules>
+			<accessrule kind="accessible" pattern="com.sun.net.httpserver.HttpHandler"/>
+			<accessrule kind="accessible" pattern="com.sun.net.httpserver.HttpExchange"/>
+			<accessrule kind="accessible" pattern="com.sun.net.httpserver.HttpServer"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>
