@@ -28,7 +28,7 @@ public class Servidor {
 	public String asunto = "AVERIA";
 	public String host_email = "smtp.gmail.com";
 	public String port_email = "587";
-	public String[] email_destino = {"danielescoms56@gmail.com", "daesdo@floridauniversitaria.es"};
+	public String[] email_destino = {"mantenimientoinvernalia@gmail.com", "megustaelfresquito@gmail.com"};
 	public String[] anexo = {"anexo/Imagen.jpg", "anexo/AVERIA.pdf"};
 	
 	
